@@ -10,7 +10,7 @@ The [**homepage**](http://sketchy.eye.gatech.edu/) of the original project.
 
 Sketchy Database
 
-## Test Set
+### Test Set
 
 As I didn't notice that the Sketchy Database contained a list of the testing photos, I randomly chose the testing photos and their related sketches myself.
 
@@ -27,7 +27,7 @@ As I didn't notice that the Sketchy Database contained a list of the testing pho
 |     zebra   |       |   66   |
 |  **Total**  |  1250 |  7875  |
 
-## The Dataset structure in my project
+### The Dataset Structure in My Project
 
 ```Bash
 Dataset
@@ -70,10 +70,16 @@ There is no GoogLeNet, which resulted the best in the original paper, implement 
 |resnet50(pretrained; triplet loss m=0.3; metric='euclidean'; lr=1e-5 batch_size=48)||| |
 |                                                          |  20   |  21.56%  |  57.50% |
 |                                                          |  95   |  30.32%  |  71.73% |
-|                                                          |  265  |  40.08%  |  78.83% |
+|        <span id="resnet"></span>                         |  265  |  40.08%  |  78.83% |
 |                                                          |  930  |  46.04%  |  83.30% |
 
 I have no idea about why the resnet34 got that bad result, while the vgg16 and resnet50 resulted pretty well.
+
+### Retrieval Result
+
+I randomly chose 20 sketches as the query sketch and here is the retrieval result. The model I used is the [resnet50](#resnet)(pretrained; triplet loss m=0.3; metric='euclidean'; lr=1e-5 batch_size=48) after 265 training epoch.
+
+![retrieval_result](record/retrieval_reslut/result.png)
 
 # Feature Visulization via T-SNE
 
