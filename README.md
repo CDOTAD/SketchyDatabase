@@ -34,7 +34,7 @@ Dataset
   ├── photo-train               # the training set of photos
   ├── sketch-triplet-train      # the training set of sketches
   ├── photo-test                # the testing set of photos
-  ├── sketch-triplet-test       # the training set of sketches
+  ├── sketch-triplet-test       # the testing set of sketches
 ```
 
 # Testing Result
