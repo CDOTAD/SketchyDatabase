@@ -2,7 +2,7 @@
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) ![](https://img.shields.io/badge/python-3.6.5-brightgreen.svg) ![](https://img.shields.io/badge/pytorch-0.4.1-brightgreen.svg) ![](https://img.shields.io/badge/visdom-0.1.8.5-brightgreen.svg) ![](https://img.shields.io/badge/tqdm-4.28.1-brightgreen.svg)
 
-This project is a repo of [**The Sketchy Database: Learning to Retrieve Badly Drawn Bunnies**](https://arxiv.org/abs/1808.02473).
+This project is a repo of [**The Sketchy Database: Learning to Retrieve Badly Drawn Bunnies**](https://www.cc.gatech.edu/~hays/tmp/sketchy-database.pdf).
 
 The [**homepage**](http://sketchy.eye.gatech.edu/) of the original project.
 
