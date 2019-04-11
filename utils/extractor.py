@@ -5,6 +5,13 @@ import torchvision as tv
 from torch import nn
 import pickle
 from utils.visualize import Visualizer
+from data import ImageDataLoader
+import numpy as np
+
+
+class Config(object):
+    def __init__(self):
+        return
 
 
 class Extractor(object):
@@ -31,10 +38,14 @@ class Extractor(object):
         if self.vis:
             self.viser = Visualizer('caffe2torch_test')
 
+    # extract the inputs' feature via self.model
+    # the model's output only contains the inputs' feature
     @t.no_grad()
     def extract(self, data_root, out_root=None):
         feature = []
         name = []
+
+        self.model.eval()
 
         cnames = sorted(os.listdir(data_root))
 
@@ -56,6 +67,7 @@ class Extractor(object):
                 feature.append(i_feature.cpu().squeeze().numpy())
                 name.append(cname + '/' + fname)
 
+        # 'name': category_name/file_name 'feature' : (1, D) array
         data = {'name': name, 'feature': feature}
         if out_root:
             out = open(out_root, 'wb')
@@ -65,10 +77,14 @@ class Extractor(object):
 
         return data
 
+    # extract the inputs' feature via self.model
+    # the model's output contains both the inputs' feature and category info
     @t.no_grad()
     def extract_new(self, data_root, out_root=None):
         feature = []
         name = []
+
+        self.model.eval()
 
         cnames = sorted(os.listdir(data_root))
 
@@ -99,6 +115,47 @@ class Extractor(object):
 
         return data
 
+    # extract the inputs' feature via self.model
+    # the model's output contains both the inputs' feature and category info
+    # the input is loaded by dataloader
+    @t.no_grad()
+    def extract_with_dataloader(self, data_root, batch_size, out_root=None):
+        names = []
+
+        self.model.eval()
+
+        opt = Config()
+        opt.image_root = data_root
+        opt.batch_size = batch_size
+
+        data_loader = ImageDataLoader(opt)
+        dataset = data_loader.load_data()
+
+        for i, data in enumerate(dataset):
+            image = data['I'].cuda()
+            name = data['N']
+
+            _, i_feature = self.model(image)
+
+            if i == 0:
+                feature = i_feature.cpu().squeeze().numpy()
+
+            else:
+                feature = np.append(feature, i_feature.cpu().squeeze().numpy(), axis=0)
+
+            names += name
+
+        data = {'name': names, 'feature': feature}
+        if out_root:
+            out = open(out_root, 'wb')
+            pickle.dump(data, out)
+
+            out.close()
+
+        return data
+
+    # reload model with model file
+    # the reloaded model contains fully connection layer
     def reload_state_dict_with_fc(self, state_file):
         temp_model = tv.models.resnet34(pretrained=False)
         temp_model.fc = nn.Linear(512, 125)
@@ -113,8 +170,11 @@ class Extractor(object):
         model_dict.update(pretrained_dict)
         self.model.load_state_dict(model_dict)
 
+    # reload model with model file
+    # the reloaded model doesn't contain fully connection layer
     def reload_state_dic(self, state_file):
         self.model.load_state_dict(t.load(state_file))
 
+    # reload model with model object directly
     def reload_model(self, model):
         self.model = model
