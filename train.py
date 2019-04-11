@@ -23,6 +23,7 @@ def parase_args():
     parser.add_argument('--epochs', type=int, default=1000, help='The number of epochs to run (default: 1000)')
     parser.add_argument('--lr', type=float, default=1e-5, help='The learning rate of the model')
 
+    parser.add_argument('--test_f', type=int, default=5, help='The frequency of testing (default: 5)')
     parser.add_argument('--photo_test', type=str, default='/data1/zzl/dataset/photo-test', help='Testing photo root')
     parser.add_argument('--sketch_test', type=str, default='/data1/zzl/dataset/sketch-triplet-test',
                         help='Testing sketch root')
