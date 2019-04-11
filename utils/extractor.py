@@ -50,22 +50,24 @@ class Extractor(object):
         cnames = sorted(os.listdir(data_root))
 
         for cname in cnames:
-            fnames = sorted(os.listdir(os.path.join(data_root, cname)))
-            for fname in fnames:
-                path = os.path.join(data_root, cname, fname)
+            c_path = os.path.join(data_root, cname):
+            if os.path.isdir(c_path):
+                fnames = sorted(os.listdir(c_path))
+                for fname in fnames:
+                    path = os.path.join(c_path, fname)
 
-                image = Image.open(path)
-                image = self.transform(image)
-                image = image[None]
-                image = image.cuda()
+                    image = Image.open(path)
+                    image = self.transform(image)
+                    image = image[None]
+                    image = image.cuda()
 
-                if self.vis:
-                    self.viser.images(image.cpu().numpy()*0.5 + 0.5, win='extractor')
+                    if self.vis:
+                        self.viser.images(image.cpu().numpy()*0.5 + 0.5, win='extractor')
 
-                i_feature = self.model(image)
+                    i_feature = self.model(image)
 
-                feature.append(i_feature.cpu().squeeze().numpy())
-                name.append(cname + '/' + fname)
+                    feature.append(i_feature.cpu().squeeze().numpy())
+                    name.append(cname + '/' + fname)
 
         # 'name': category_name/file_name 'feature' : (1, D) array
         data = {'name': name, 'feature': feature}
@@ -89,22 +91,24 @@ class Extractor(object):
         cnames = sorted(os.listdir(data_root))
 
         for cname in cnames:
-            fnames = sorted(os.listdir(os.path.join(data_root, cname)))
-            for fname in fnames:
-                path = os.path.join(data_root, cname, fname)
+            c_path = os.path.join(data_root, cname)
+            if os.path.isdir(c_path):
+                fnames = sorted(os.listdir(c_path))
+                for fname in fnames:
+                    path = os.path.join(c_path, fname)
 
-                image = Image.open(path)
-                image = self.transform(image)
-                image = image[None]
-                image = image.cuda()
+                    image = Image.open(path)
+                    image = self.transform(image)
+                    image = image[None]
+                    image = image.cuda()
 
-                if self.vis:
-                    self.viser.images(image.cpu().numpy() * 0.5 + 0.5, win='extractor')
+                    if self.vis:
+                        self.viser.images(image.cpu().numpy() * 0.5 + 0.5, win='extractor')
 
-                _, i_feature = self.model(image)
+                    _, i_feature = self.model(image)
 
-                feature.append(i_feature.cpu().squeeze().numpy())
-                name.append(cname + '/' + fname)
+                    feature.append(i_feature.cpu().squeeze().numpy())
+                    name.append(cname + '/' + fname)
 
         data = {'name': name, 'feature': feature}
         if out_root:

@@ -9,10 +9,12 @@ def make_dataset(root):
 
     cnames = os.listdir(root)
     for cname in cnames:
-        fnames = os.listdir(os.path.join(root, cname))
-        for fname in fnames:
-            path = os.path.join(root, cname, fname)
-            images.append(path)
+        c_path = os.path.join(root, cname)
+        if os.path.isdir(c_path):
+            fnames = os.listdir(c_path)
+            for fname in fnames:
+                path = os.path.join(c_path, fname)
+                images.append(path)
 
     return images
 
