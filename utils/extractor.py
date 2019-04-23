@@ -50,7 +50,7 @@ class Extractor(object):
         cnames = sorted(os.listdir(data_root))
 
         for cname in cnames:
-            c_path = os.path.join(data_root, cname):
+            c_path = os.path.join(data_root, cname)
             if os.path.isdir(c_path):
                 fnames = sorted(os.listdir(c_path))
                 for fname in fnames:

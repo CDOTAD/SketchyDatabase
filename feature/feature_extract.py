@@ -30,7 +30,7 @@ vgg.classifier[6] = nn.Linear(in_features=4096, out_features=125, bias=True)
 vgg.load_state_dict(t.load(PHOTO_VGG, map_location=t.device('cpu')))
 vgg.to(device)
 
-ext = Extractor(pretrained=False, device=device)
+ext = Extractor(pretrained=False)
 ext.reload_model(vgg)
 
 photo_feature = ext.extract_with_dataloader(test_photo_root, 'photo-vgg-190epoch.pkl')
@@ -47,7 +47,7 @@ resnet.fc = nn.Linear(in_features=2048, out_features=125)
 resnet.load_state_dict(t.load(PHOTO_RESNET, map_location=t.device('cpu')))
 resnet.to(device)
 
-ext = Extractor(pretrained=False, device=device)
+ext = Extractor(pretrained=False)
 ext.reload_model(resnet)
 
 photo_feature = ext.extract_with_dataloader(test_photo_root, 'photo-resnet-epoch.pkl')

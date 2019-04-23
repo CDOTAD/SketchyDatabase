@@ -17,7 +17,7 @@ def make_dataset(root):
 
     cnames = os.listdir(root)
     for cname in cnames:
-        c_path = os.path.join(root, cname):
+        c_path = os.path.join(root, cname)
         if os.path.isdir(c_path):
             fnames = os.listdir(c_path)
             for fname in fnames:
