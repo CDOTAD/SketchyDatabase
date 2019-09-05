@@ -5,9 +5,11 @@ from models.vgg import vgg16
 from models.sketch_resnet import resnet34, resnet50
 from utils.visualize import Visualizer
 from torchnet.meter import AverageValueMeter
-import tqdm
+# import tqdm
 from utils.extractor import Extractor
 from sklearn.neighbors import NearestNeighbors
+from torch.nn import DataParallel
+from .TripletLoss import TripletLoss
 import os
 import numpy as np
 
@@ -33,6 +35,7 @@ class TripletNet(object):
         self.sketch_test = opt.sketch_test
         self.test_f = opt.test_f
 
+        self.save_model = opt.save_model
         self.save_dir = opt.save_dir
 
         # vis
@@ -80,14 +83,14 @@ class TripletNet(object):
     def train(self):
 
         if self.net == 'vgg16':
-            photo_net = self._get_vgg16().cuda()
-            sketch_net = self._get_vgg16().cuda()
+            photo_net = DataParallel(self._get_vgg16()).cuda()
+            sketch_net = DataParallel(self._get_vgg16()).cuda()
         elif self.net == 'resnet34':
-            photo_net = self._get_resnet34().cuda()
-            sketch_net = self._get_resnet34().cuda()
+            photo_net = DataParallel(self._get_resnet34()).cuda()
+            sketch_net = DataParallel(self._get_resnet34()).cuda()
         elif self.net == 'resnet50':
-            photo_net = self._get_resnet50().cuda()
-            sketch_net = self._get_resnet50().cuda()
+            photo_net = DataParallel(self._get_resnet50()).cuda()
+            sketch_net = DataParallel(self._get_resnet50()).cuda()
 
         if self.fine_tune:
             photo_net_root = self.model_root
@@ -96,9 +99,11 @@ class TripletNet(object):
             photo_net.load_state_dict(t.load(photo_net_root, map_location=t.device('cpu')))
             sketch_net.load_state_dict(t.load(sketch_net_root, map_location=t.device('cpu')))
 
-        triplet_loss = nn.TripletMarginLoss(margin=self.margin, p=self.p).cuda()
+        # triplet_loss = nn.TripletMarginLoss(margin=self.margin, p=self.p).cuda()
         photo_cat_loss = nn.CrossEntropyLoss().cuda()
         sketch_cat_loss = nn.CrossEntropyLoss().cuda()
+
+        my_triplet_loss = TripletLoss().cuda()
 
         # optimizer
         photo_optimizer = t.optim.Adam(photo_net.parameters(), lr=self.lr)
@@ -114,7 +119,9 @@ class TripletNet(object):
         data_loader = TripleDataLoader(self.dataloader_opt)
         dataset = data_loader.load_data()
 
-        for epoch in tqdm.tqdm(range(self.epochs)):
+        for epoch in range(self.epochs):
+
+            print('---------------{0}---------------'.format(epoch))
 
             if epoch % self.test_f == 0:
                 # test
@@ -143,7 +150,7 @@ class TripletNet(object):
                     count_1 = 0
                     count_5 = 0
                     K = 5
-                    for ii, (query_sketch, query_name) in tqdm.tqdm(enumerate(zip(sketch_feature, sketch_name))):
+                    for ii, (query_sketch, query_name) in enumerate(zip(sketch_feature, sketch_name)):
                         query_sketch = np.reshape(query_sketch, [1, np.shape(query_sketch)[0]])
 
                         query_split = query_name.split('/')
@@ -172,8 +179,10 @@ class TripletNet(object):
                 print('recall@1 :', recall_1, '    recall@5 :', recall_5)
                 if self.vis:
                     vis.plot('recall', np.array([recall_1, recall_5]), legend=['recall@1', 'recall@5'])
-                t.save(photo_net.state_dict(), self.save_dir + '/photo' + '/photo_' + self.net + '_%s.pth' % epoch)
-                t.save(sketch_net.state_dict(), self.save_dir + '/sketch' + '/sketch_' + self.net + '_%s.pth' % epoch)
+
+                if self.save_model:
+                    t.save(photo_net.state_dict(), self.save_dir + '/photo' + '/photo_' + self.net + '_%s.pth' % epoch)
+                    t.save(sketch_net.state_dict(), self.save_dir + '/sketch' + '/sketch_' + self.net + '_%s.pth' % epoch)
 
             photo_net.train()
             sketch_net.train()
@@ -205,6 +214,8 @@ class TripletNet(object):
                 # triplet loss
                 loss = p_cat_loss + s_cat_loss
 
+                # tri_record = 0.
+                '''
                 for i in range(self.batch_size):
                     # negative
                     negative_feature = t.cat([p_feature[0:i, :], p_feature[i + 1:, :]], dim=0)
@@ -220,8 +231,20 @@ class TripletNet(object):
                     # print('positive_feature.size :', positive_feature.size())
 
                     tri_loss = triplet_loss(anchor_feature, positive_feature, negative_feature)
+
+                    tri_record = tri_record + tri_loss
+
                     # print('tri_loss :', tri_loss)
                     loss = loss + tri_loss
+                '''
+                # print('tri_record : ', tri_record)
+
+                my_tri_loss = my_triplet_loss(s_feature, p_feature) / (self.batch_size - 1)
+                triplet_loss_meter.add(my_tri_loss.item())
+                # print('my_tri_loss : ', my_tri_loss)
+
+                # print(tri_record - my_tri_loss)
+                loss = loss + my_tri_loss
                 # print('loss :', loss)
                 # loss = loss / opt.batch_size
 
@@ -230,7 +253,6 @@ class TripletNet(object):
                 photo_optimizer.step()
                 sketch_optimizer.step()
 
-                triplet_loss_meter.add(loss.item())
             if self.vis:
                 vis.plot('triplet_loss', np.array([triplet_loss_meter.value()[0], photo_cat_loss_meter.value()[0],
                                                    sketch_cat_loss_meter.value()[0]]),
