@@ -1,7 +1,7 @@
 import torch.nn as nn
 import math
 import torch.utils.model_zoo as model_zoo
-import torch
+from .AttentionLayer import AttentionLayer
 
 __all__ = ['ResNet', 'resnet50', 'resnet34']
 
@@ -91,22 +91,6 @@ class Bottleneck(nn.Module):
         return out
 
 
-class AttentionLayer(nn.Module):
-    def __init__(self, in_features):
-        super(AttentionLayer, self).__init__()
-
-        self.att = nn.Linear(in_features=in_features, out_features=in_features)
-        self.gamma = nn.Parameter(torch.zeros(1))
-        self.softmax = nn.Softmax(dim=-1)
-
-    def forward(self, x):
-
-        attention = self.att(x)
-        attention = self.softmax(attention)
-
-        out = self.gamma*attention + x
-
-        return out
 
 
 class ResNet(nn.Module):
@@ -124,9 +108,10 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AvgPool2d(7, stride=1)
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
         if self.att:
             self.attention = AttentionLayer(in_features=512 * block.expansion)
+
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
         for m in self.modules():
@@ -165,14 +150,19 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
+        if self.att:
+            x, attn_mask = self.attention(x)
+
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
-        if self.att:
-            x = self.attention(x)
+
         feature = x
         x = self.fc(x)
 
-        return x, feature
+        if self.att:
+            return x, feature, attn_mask
+        else:
+            return x, feature
 
 
 def resnet34(pretrained=False, **kwargs):
