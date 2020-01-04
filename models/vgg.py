@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 import math
-from .AttentionLayer import AttentionLayer
 
 
 __all__ = [
@@ -16,12 +15,9 @@ model_urls = {
 
 class VGG(nn.Module):
 
-    def __init__(self, features, num_classes=1000, init_weights=True, att=False):
+    def __init__(self, features, num_classes=1000, init_weights=True):
         super(VGG, self).__init__()
-        self.att = att
         self.features = features
-        if self.att:
-            self.attention = AttentionLayer(512)
 
         self.classifier = nn.Sequential(
             nn.Linear(512 * 7 * 7, 4096),
@@ -38,15 +34,10 @@ class VGG(nn.Module):
     def forward(self, x):
         x = self.features(x)
         # print('feature.size()', x.size())
-        if self.att:
-            feature, attn_mask = self.attention(x)
 
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        if self.att:
-            return x, feature, attn_mask
-        else:
-            return x, feature
+        return x, feature
 
     def _initialize_weights(self):
         for m in self.modules():

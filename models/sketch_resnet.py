@@ -1,7 +1,6 @@
 import torch.nn as nn
 import math
 import torch.utils.model_zoo as model_zoo
-from .AttentionLayer import AttentionLayer
 
 __all__ = ['ResNet', 'resnet50', 'resnet34']
 
