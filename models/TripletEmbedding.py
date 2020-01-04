@@ -53,7 +53,6 @@ class TripletNet(object):
         data_opt.photo_root = opt.photo_root
         data_opt.sketch_root = opt.sketch_root
         data_opt.batch_size = opt.batch_size
-        # data_opt.att = opt.att
 
         self.dataloader_opt = data_opt
 
@@ -160,12 +159,9 @@ class TripletNet(object):
                 photo = data['P'].cuda()
                 sketch = data['S'].cuda()
                 label = data['L'].cuda()
-                if self.att:
-                    p_cat, p_feature, _ = photo_net(photo)
-                    s_cat, s_feature, _ = sketch_net(sketch)
-                else:
-                    p_cat, p_feature = photo_net(photo)
-                    s_cat, s_feature = sketch_net(sketch)
+                
+                p_cat, p_feature = photo_net(photo)
+                s_cat, s_feature = sketch_net(sketch)
 
                 # category loss
                 p_cat_loss = photo_cat_loss(p_cat, label)
