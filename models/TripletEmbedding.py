@@ -47,7 +47,6 @@ class TripletNet(object):
         # fine_tune
         self.fine_tune = opt.fine_tune
         self.model_root = opt.model_root
-        self.att = opt.att
 
         # dataloader config
         data_opt = Config()
@@ -66,20 +65,20 @@ class TripletNet(object):
         self.net = opt.net
         self.cat = opt.cat
 
-    def _get_vgg16(self, att=False, pretrained=True):
-        model = vgg16(att=att, pretrained=pretrained)
+    def _get_vgg16(self, pretrained=True):
+        model = vgg16(pretrained=pretrained)
         model.classifier[6] = nn.Linear(in_features=4096, out_features=125, bias=True)
 
         return model
 
-    def _get_resnet34(self, att=False, pretrained=True):
-        model = resnet34(att=att, pretrained=pretrained)
+    def _get_resnet34(self, pretrained=True):
+        model = resnet34(pretrained=pretrained)
         model.fc = nn.Linear(in_features=512, out_features=125)
 
         return model
 
-    def _get_resnet50(self, att=False, pretrained=True):
-        model = resnet50(att=att, pretrained=pretrained)
+    def _get_resnet50(self, pretrained=True):
+        model = resnet50(pretrained=pretrained)
         model.fc = nn.Linear(in_features=2048, out_features=125)
 
         return model
@@ -87,14 +86,14 @@ class TripletNet(object):
     def train(self):
 
         if self.net == 'vgg16':
-            photo_net = DataParallel(self._get_vgg16(att=self.att)).cuda()
-            sketch_net = DataParallel(self._get_vgg16(att=self.att)).cuda()
+            photo_net = DataParallel(self._get_vgg16()).cuda()
+            sketch_net = DataParallel(self._get_vgg16()).cuda()
         elif self.net == 'resnet34':
-            photo_net = DataParallel(self._get_resnet34(att=self.att)).cuda()
-            sketch_net = DataParallel(self._get_resnet34(att=self.att)).cuda()
+            photo_net = DataParallel(self._get_resnet34()).cuda()
+            sketch_net = DataParallel(self._get_resnet34()).cuda()
         elif self.net == 'resnet50':
-            photo_net = DataParallel(self._get_resnet50(att=self.att)).cuda()
-            sketch_net = DataParallel(self._get_resnet50(att=self.att)).cuda()
+            photo_net = DataParallel(self._get_resnet50()).cuda()
+            sketch_net = DataParallel(self._get_resnet50()).cuda()
 
         if self.fine_tune:
             photo_net_root = self.model_root

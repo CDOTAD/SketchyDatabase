@@ -95,7 +95,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, att=False):
+    def __init__(self, block, layers, num_classes=1000):
         self.inplanes = 64
         self.att = att
         super(ResNet, self).__init__()
@@ -109,8 +109,6 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
         self.avgpool = nn.AdaptiveAvgPool2d(1)
-        if self.att:
-            self.attention = AttentionLayer(in_features=512 * block.expansion)
 
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
@@ -150,19 +148,13 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        if self.att:
-            x, attn_mask = self.attention(x)
-
         x = self.avgpool(x)
         x = x.view(x.size(0), -1)
 
         feature = x
         x = self.fc(x)
 
-        if self.att:
-            return x, feature, attn_mask
-        else:
-            return x, feature
+        return x, feature
 
 
 def resnet34(pretrained=False, **kwargs):
@@ -177,7 +169,7 @@ def resnet34(pretrained=False, **kwargs):
     return model
 
 
-def resnet50(pretrained=False, att=False, **kwargs):
+def resnet50(pretrained=False, **kwargs):
     """Constructs a ResNet-50 model.
 
     Args:
