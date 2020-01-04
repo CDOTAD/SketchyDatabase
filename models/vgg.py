@@ -2,7 +2,6 @@ import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 import math
 
-
 __all__ = [
     'VGG', 'vgg16',
 ]
@@ -18,6 +17,7 @@ class VGG(nn.Module):
     def __init__(self, features, num_classes=1000, init_weights=True):
         super(VGG, self).__init__()
         self.features = features
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
         self.classifier = nn.Sequential(
             nn.Linear(512 * 7 * 7, 4096),
@@ -34,9 +34,10 @@ class VGG(nn.Module):
     def forward(self, x):
         x = self.features(x)
         # print('feature.size()', x.size())
-
+        feature = self.avgpool(x)
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
+
         return x, feature
 
     def _initialize_weights(self):
