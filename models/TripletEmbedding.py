@@ -138,7 +138,6 @@ class TripletNet(object):
 
                 tester_config.photo_test = self.photo_test
                 tester_config.sketch_test = self.sketch_test
-                tester_config.att = self.att
 
                 tester = Tester(tester_config)
                 test_result = tester.test_instance_recall()

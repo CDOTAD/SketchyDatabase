@@ -18,8 +18,6 @@ class Tester(object):
         self.photo_test = opt.photo_test
         self.sketch_test = opt.sketch_test
 
-        self.att = opt.att
-
         self.eps = 1e-8
 
     @t.no_grad()
@@ -28,7 +26,7 @@ class Tester(object):
             self.photo_net.eval()
             self.sketch_net.eval()
 
-            extractor = Extractor(e_model=self.photo_net, vis=False, att=self.att, dataloader=True)
+            extractor = Extractor(e_model=self.photo_net, vis=False, dataloader=True)
             photo_data = extractor.extract(self.photo_test)
 
             extractor.reload_model(self.sketch_net)
@@ -48,7 +46,7 @@ class Tester(object):
             self.photo_net.eval()
             self.sketch_net.eval()
 
-            extractor = Extractor(e_model=self.photo_net, cat_info=False, vis=False, att=self.att, dataloader=True)
+            extractor = Extractor(e_model=self.photo_net, cat_info=False, vis=False, dataloader=True)
             photo_data = extractor.extract(self.photo_test, batch_size=self.test_bs)
 
             extractor.reload_model(self.sketch_net)
