@@ -31,8 +31,6 @@ class Extractor(object):
                 tv.transforms.ToTensor(),
                 tv.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
             ])
-
-        self.att = att
         self.vis = vis
         if self.vis:
             self.viser = Visualizer('caffe2torch_test')
