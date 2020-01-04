@@ -17,7 +17,7 @@ class Config(object):
 class Extractor(object):
 
     def __init__(self, e_model, batch_size=128, cat_info=True,
-                 vis=False, att=False, dataloader=False):
+                 vis=False, dataloader=False):
         self.batch_size = batch_size
         self.cat_info = cat_info
 
@@ -75,10 +75,7 @@ class Extractor(object):
                     if cat_info:
                         i_feature = out[1]
                     else:
-                        if self.att:
-                            i_feature = out[0]
-                        else:
-                            i_feature = out
+                        i_feature = out
 
                     feature.append(i_feature.cpu().squeeze().numpy())
                     name.append(cname + '/' + fname)
@@ -116,10 +113,7 @@ class Extractor(object):
             if cat_info:
                 i_feature = out[1]
             else:
-                if self.att:
-                    i_feature = out[0]
-                else:
-                    i_feature = out
+                i_feature = out
             if i == 0:
                 feature = i_feature.cpu().squeeze().numpy()
 

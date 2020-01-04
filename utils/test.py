@@ -126,7 +126,7 @@ class Tester(object):
                 retrieved_name = retrieved_name.split('/')[1]
                 retrieved_name = retrieved_name.split('.')[0]
                 if retrieved_class == query_class:
-                    if query_img.find(retrieved_name) != -1:
+                    if query_img.split('-')[0] == retrieved_name:
                         if i == 0:
                             count_1 += 1
                         count_5 += 1

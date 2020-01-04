@@ -75,7 +75,7 @@ class TripleDataset(data.Dataset):
 
         sketch_rel = []
         for sketch_name in sketchs:
-            if sketch_name.find(fname) != -1:
+            if sketch_name.split('-')[0] == fname:
                 sketch_rel.append(sketch_name)
 
         rnd = np.random.randint(0, len(sketch_rel))
