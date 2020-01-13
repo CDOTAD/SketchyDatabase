@@ -12,7 +12,7 @@ Sketchy Database
 
 ### Test Set
 
-As I didn't notice that the Sketchy Database contained a list of the testing photos, I randomly chose the testing photos and their related sketches myself.
+As I didn't notice that the Sketchy Database contained a list of the testing photos, I randomly chose the testing photos and their related sketches myself. The test data set are listed in [TEST_IMG](test_img.txt) and [TEST_SKETCH](test_sketch.txt)
 
 |   category  | photo | sketch |
 |    :---:    | :---: | :---:  |
