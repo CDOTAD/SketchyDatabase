@@ -36,6 +36,11 @@ Dataset
   ├── photo-test                # the testing set of photos
   ├── sketch-triplet-test       # the testing set of sketches
 ```
+# Test
+
+using [feature_extract.py](https://github.com/CDOTAD/SketchyDatabase/blob/master/feature/feature_extract.py) to get the extracted feature files ('\*.pkl')
+
+using [retrieval_test.py](https://github.com/CDOTAD/SketchyDatabase/blob/master/retrieval_test.py) to get the testing result.
 
 # Testing Result
 
