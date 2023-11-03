@@ -6,6 +6,8 @@ This project is a repo of [**The Sketchy Database: Learning to Retrieve Badly Dr
 
 The [**homepage**](http://sketchy.eye.gatech.edu/) of the original project.
 
+Get the dataset via Google Drive [sketchydataset](https://drive.google.com/file/d/0B7ISyeE8QtDdTjE1MG9Gcy1kSkE/view?usp=sharing&resourcekey=0-r6nB4crmdU-LK7H38xnOUw)
+
 # DataSet
 
 Sketchy Database
